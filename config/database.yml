@@ -80,6 +80,4 @@ test:
 #
 production:
   <<: *default
-  database: dinner_app_api_production
-  username: dinner_app_api
-  password: <%= ENV['DINNER_APP_API_DATABASE_PASSWORD'] %>
+  url: <%= ENV['DATABASE_URL'] %>
