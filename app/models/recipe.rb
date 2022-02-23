@@ -1,11 +1,6 @@
 class Recipe < ApplicationRecord
   PER_PAGE = 10
 
-  validates :ingredients, length: {
-    maximum: 1,
-    message: 'At least one ingredient'
-  }
-
   # TODO: in case we want to get the exact matching score to get higher precision
 
   # def matching_score(keys)
