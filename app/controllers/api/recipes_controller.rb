@@ -7,14 +7,18 @@ module Api
     private
 
     def recipes
-      @recipes ||= ingredients ? sorted_recipes : sorted_recipes.limit(10)
+      @recipes ||= ingredients.present? ? paginated_array : all_recipes.limit(Recipe::PER_PAGE)
+    end
+
+    def paginated_array
+      @paginated_array ||= Kaminari.paginate_array(sorted_recipes).page(page_params).per(Recipe::PER_PAGE)
     end
 
     def sorted_recipes
       @sorted_recipes ||= Services::MatchingService.new(
-                                                      recipes: all_recipes,
-                                                      keys: ingredients
-                                                    ).recipes_by_score
+        recipes: all_recipes,
+        keys: ingredients
+      ).recipes_by_score
     end
 
     def all_recipes

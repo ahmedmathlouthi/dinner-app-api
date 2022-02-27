@@ -1,18 +1,18 @@
 class Recipe < ApplicationRecord
-  PER_PAGE = 10
+  PER_PAGE = 9
 
-  # TODO: in case we want to get the exact matching score to get higher precision
-  def matching_score(keys)
-    score = 0
-    ingredients.each do |ingredient|
-      score += 1 if ingredient_contains_key(ingredient, keys)
-    end
-    ((score.to_f / ingredients.length)).to_i
-  end
-
-  private
-
-  def ingredient_contains_key(ingredient, keys)
-    keys.any? { |key| key.in?(ingredient) }
+  def self.order_by_matching_ingredients(keys)
+    find_by_sql("
+      SELECT r.id,
+        r.title,
+        r.ingredients,
+        r.author,
+        r.image
+        FROM recipes AS r
+        CROSS JOIN unnest ('{#{keys}}'::text[]) AS ingredients_list
+        WHERE array_to_string(r.ingredients, '||') LIKE ingredients_list
+        GROUP BY r.id, r.ingredients
+        ORDER BY array_length(array_agg(ingredients_list), 1) DESC ;
+      ")
   end
 end
